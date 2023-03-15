@@ -6,7 +6,6 @@ import org.example.dto.Profile;
 import org.example.enums.GeneralStatus;
 import org.example.enums.ProfileRole;
 import org.example.repository.ProfileRepository;
-import org.example.util.MD5;
 
 import java.util.List;
 
@@ -76,5 +75,29 @@ public class ProfileService {
             System.out.println(profile);
         }
 
+    }
+
+    public void change_status(Profile profile) {
+        List<Profile> profiles = profileRepository.get_profile(profile.getId());
+        String status = "";
+        int i = 0;
+        for (Profile profile1 : profiles) {
+            if (profile1 == null) {
+                System.out.println("Bunday terminal mavjud emas");
+                return;
+            }
+            if (profile1.getStatus().equals(GeneralStatus.BLOCK.toString())) {
+                status = GeneralStatus.ACTIVE.toString();
+                i = profileRepository.changeACTIVEstatus(profile.getId(), status);
+            }else if (profile1.getStatus().equals(GeneralStatus.ACTIVE.toString())){
+                status = GeneralStatus.BLOCK.toString();
+                i = profileRepository.changeBLOCKstatus(profile.getId(), status);
+            }
+        }
+        if (i == 0) {
+            System.out.println("Failed");
+        } else {
+            System.out.println("Terminal status changed to " + status + " successfully");
+        }
     }
 }

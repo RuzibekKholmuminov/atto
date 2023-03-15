@@ -20,21 +20,16 @@ public class Profile_Card_Service {
 
     public void addCard_to_User(Profile_Card profile_card) {
         CardRepository cardRepository = new CardRepository();
-
-
-
-
-        Card card = cardRepository.searchCardByNumber(profile_card.getCard_number());
-
+        Card card = (Card) cardRepository.searchCardByNumber(profile_card.getCard_number());
         if (card == null) {
             System.out.println("Bunday karta mavjud emas");
             return;
         }
-        if (card.getPhone()!=null){
+
+        if (card.getPhone() != null) {
             System.out.println("Bu kartani ulay olmaysiz");
             return;
         }
-
 
         int i = profile_card_repository.addCard_to_user(profile_card);
 
@@ -58,10 +53,10 @@ public class Profile_Card_Service {
     }
 
     public void change_profile_card_status(String phone, String number) {
-        Card card = cardRepository.searchCardByNumber(number);
+        Card card = (Card) cardRepository.searchCardByNumber(number);
 
         String status = GeneralStatus.BLOCK.name();
-        if (card.getStatus().equals(GeneralStatus.BLOCK)) {
+        if (card.getStatus().equals(GeneralStatus.BLOCK.toString())) {
             status = GeneralStatus.ACTIVE.name();
         }
 

@@ -79,7 +79,7 @@ public class AdminTerminalController {
         System.out.print("Enter address");
         String address = scanner.next();
 
-        Terminal terminal = new Terminal(code, address, GeneralStatus.ACTIVE, LocalDateTime.now());
+        Terminal terminal = new Terminal(code, address, GeneralStatus.ACTIVE.toString(), LocalDateTime.now());
         terminalService.create(terminal);
 
     }

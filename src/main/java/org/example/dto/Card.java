@@ -3,8 +3,8 @@ package org.example.dto;
 import org.example.enums.GeneralStatus;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Table(name = "Card")
@@ -12,14 +12,14 @@ public class Card {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name = "number")
+    @Column(name = "number", unique = false)
     private String number;
     @Column(name = "exp_date")
-    private LocalDate exp_date;
+    private Date exp_date;
     @Column(name = "balance")
     private Long balance;
     @Column(name = "status")
-    private GeneralStatus status;
+    private String status;
     @Column(name = "phone")
     private String phone;
     @Column(name = "created_date")
@@ -28,7 +28,7 @@ public class Card {
     public Card() {
     }
 
-    public Card(String number, LocalDate exp_date, Long balance, GeneralStatus status, String phone, LocalDateTime created_date) {
+    public Card(String number, Date exp_date, Long balance, String status, String phone, LocalDateTime created_date) {
         this.number = number;
         this.exp_date = exp_date;
         this.balance = balance;
@@ -37,7 +37,7 @@ public class Card {
         this.created_date = created_date;
     }
 
-    public Card(Integer id, String number, LocalDate exp_date, Long balance, GeneralStatus status, String phone, LocalDateTime created_date) {
+    public Card(Integer id, String number, Date exp_date, Long balance, String status, String phone, LocalDateTime created_date) {
         this.id = id;
         this.number = number;
         this.exp_date = exp_date;
@@ -63,11 +63,11 @@ public class Card {
         this.number = number;
     }
 
-    public LocalDate getExp_date() {
+    public Date getExp_date() {
         return exp_date;
     }
 
-    public void setExp_date(LocalDate exp_date) {
+    public void setExp_date(Date exp_date) {
         this.exp_date = exp_date;
     }
 
@@ -79,11 +79,11 @@ public class Card {
         this.balance = balance;
     }
 
-    public GeneralStatus getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(GeneralStatus status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 

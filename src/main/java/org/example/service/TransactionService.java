@@ -31,19 +31,21 @@ public class TransactionService {
     public void profile_reFill(String phone, String number, Long amount) {
 
         CardRepository cardRepository = new CardRepository();
-        Card card = cardRepository.searchCardByNumber(number);
-        if (card == null) {
-            System.out.println("Bunday card yoq");
-            return;
-        }
-        if (card.getPhone() == null) {
-            System.out.println("This card is not yours");
-            return;
-        }
+        List<Card> card = cardRepository.searchCardByNumber(number);
+        for (Card card1 : card) {
+            if (card1 == null) {
+                System.out.println("Bunday card yoq");
+                return;
+            }
+            if (card1.getPhone() == null) {
+                System.out.println("This card is not yours");
+                return;
+            }
 
-        if (!card.getPhone().equals(phone)) {
-            System.out.println("This card is not yours");
-            return;
+            if (!card1.getPhone().equals(phone)) {
+                System.out.println("This card is not yours");
+                return;
+            }
         }
 
         int i = transactionRepository.profile_refill(number, amount);
@@ -70,16 +72,18 @@ public class TransactionService {
     public void make_payment(Transaction transaction, String phone) {
 
         CardRepository cardRepository = new CardRepository();
-        Card card = cardRepository.searchCardByNumber(transaction.getCard_number());
-        if (card == null) {
-            System.out.println("The card is not available");
-            return;
+        List<Card> card = cardRepository.searchCardByNumber(transaction.getCard_number());
+        for (Card card1 : card) {
+            if (card1 == null) {
+                System.out.println("The card is not available");
+                return;
+            }
+            if (card1.getPhone()==null||!card1.getPhone().equals(phone)) {
+                System.out.println("The card is not yours");
+                return;
+            }
         }
 
-        if (card.getPhone()==null||!card.getPhone().equals(phone)) {
-            System.out.println("The card is not yours");
-            return;
-        }
 
 
 

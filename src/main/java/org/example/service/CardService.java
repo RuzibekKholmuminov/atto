@@ -16,10 +16,12 @@ public class CardService {
     }
 
     public void addCard_toDb(Card card) {
-        Card card1 = cardRepository.searchCardByNumber(card.getNumber());
-        if (card1 != null) {
-            System.out.println("Bunday karta mavjud");
-            return;
+        List<Card> card1 =  cardRepository.searchCardByNumber(card.getNumber());
+        for (Card card2: card1) {
+            if (card2 != null) {
+                System.out.println("Bunday karta mavjud");
+                return;
+            }
         }
 
         int i = cardRepository.addCardToDb(card);
@@ -30,10 +32,12 @@ public class CardService {
     public void get_card_list() {
         List<Card> card_list = cardRepository.get_card_list();
 
+        System.out.println("                                ** Card List **");
         for (Card card : card_list) {
             System.out.println(card);
 
         }
+        System.out.println();
 
     }
 
@@ -48,19 +52,22 @@ public class CardService {
     }
 
     public void changeStatus(String number) {
-        Card card = cardRepository.searchCardByNumber(number);
-        if (card == null) {
-            System.out.println("Bunday card yoq");
-            return;
+        String status = "";
+        int i = 0;
+        List<Card> card =  cardRepository.searchCardByNumber(number);
+        for (Card card1 : card) {
+            if (card1 == null) {
+                System.out.println("Bunday card yoq");
+                return;
+            }
+            if (card1.getStatus().equals(GeneralStatus.ACTIVE.toString())) {
+                status = GeneralStatus.BLOCK.name();
+                i = cardRepository.changeACTIVEStatus(number, status);
+            } else if (card1.getStatus().equals(GeneralStatus.BLOCK.toString())) {
+                status = GeneralStatus.ACTIVE.name();
+                i = cardRepository.changeBLOCKStatus(number, status);
+            }
         }
-
-        String status = GeneralStatus.BLOCK.name();
-        if (card.getStatus().equals(GeneralStatus.BLOCK)) {
-            status = GeneralStatus.ACTIVE.name();
-
-        }
-
-        int i = cardRepository.changeStatus(number, status);
 
         if (i != 0) {
             System.out.println("Changed to" + status);
@@ -72,18 +79,15 @@ public class CardService {
 
     public void reFill(Transaction transaction) {
 
-        Card card = cardRepository.searchCardByNumber(transaction.getCard_number());
-        if (card == null) {
-            System.out.println("The card is not exists");
-            return;
+        List<Card> card =  cardRepository.searchCardByNumber(transaction.getCard_number());
+        for (Card card1 : card) {
+            if (card1 == null) {
+                System.out.println("The card is not exists");
+                return;
+            }
         }
-
-
         TransactionRepository transactionRepository = new TransactionRepository();
-
         transactionRepository.reFill(transaction);
-
-
     }
 
     public void deleteCard(String number) {

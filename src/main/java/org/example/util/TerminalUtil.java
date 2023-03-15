@@ -16,7 +16,7 @@ public class TerminalUtil {
             String address = resultSet.getString("address");
             String status = resultSet.getString("status");
             Timestamp c_d = resultSet.getTimestamp("created_date");
-            return new Terminal(id, code1, address, GeneralStatus.valueOf(status), c_d.toLocalDateTime());
+            return new Terminal(id, code1, address, status, c_d.toLocalDateTime());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

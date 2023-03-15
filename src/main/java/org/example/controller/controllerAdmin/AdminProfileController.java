@@ -1,7 +1,10 @@
 package org.example.controller.controllerAdmin;
 
+import org.example.dto.Profile;
 import org.example.service.ProfileService;
 import org.example.util.ScannerUtil;
+
+import java.util.Scanner;
 
 
 public class AdminProfileController {
@@ -38,7 +41,12 @@ public class AdminProfileController {
     }
 
     private void change_status() {
-
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter profile id: ");
+        Integer id = scanner.nextInt();
+        Profile profile = new Profile();
+        profile.setId(id);
+        profileService.change_status(profile);
     }
 
     private void get_profile_list() {

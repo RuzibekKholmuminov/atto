@@ -1,10 +1,19 @@
 package org.example.controller.controllerAdmin;
 
 import org.example.db.DataBase;
+import org.example.dto.Card;
+import org.example.dto.Profile;
 import org.example.repository.ProfileRepository;
 import org.example.service.CardService;
 import org.example.service.TransactionService;
 import org.example.util.ScannerUtil;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.boot.Metadata;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -34,42 +43,26 @@ public class AdminController {
 
 
     public int changePassword() {
-
-        Connection connection = DataBase.getConnection();
         Scanner scanner = new Scanner(System.in);
         System.out.println("Tel raqam kiriting: ");
         String newPhone = scanner.next();
         System.out.println("Yangi password kiriting: ");
         String newPassword=scanner.next();
-        try {
-            PreparedStatement statement = connection.prepareStatement("update profile set password=? where phone=?;");
-            statement.setString(1, newPassword);
-            statement.setString(2, newPhone);
+        StandardServiceRegistry ssr = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
+        Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
+        SessionFactory factory = meta.getSessionFactoryBuilder().build();
 
-            System.out.println("Successfull!");
-            return statement.executeUpdate();
+        Session session = factory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.createQuery("UPDATE Profile set password = " + newPassword + " where phone = " + newPhone + "", Profile.class).getResultList();
 
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            }
-        }
+        transaction.commit();
+        session.close();
 
         return 0;
     }
 
     private void deleteAdminByName() {
-
         ProfileRepository profileRepository = new ProfileRepository();
         profileRepository.deleteProfileToDb();
     }

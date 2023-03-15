@@ -14,15 +14,13 @@ public class TerminalService {
     }
 
     public void create(Terminal terminal) {
-
-        Terminal terminal1 = terminalRepository.getTerminal(terminal.getCode());
-
-        if (terminal1 != null) {
-            System.out.println("Bunday kodli terminal mavjud");
-            return;
+        List<Terminal> terminal1 = terminalRepository.getTerminal(terminal.getCode());
+        for (Terminal terminal2 : terminal1) {
+            if (terminal2 != null) {
+                System.out.println("Bunday kodli terminal mavjud");
+                return;
+            }
         }
-
-
         int i = terminalRepository.addTerminalToDb(terminal);
         if (i != 0) {
             System.out.println("Terminal Created");
@@ -53,21 +51,22 @@ public class TerminalService {
     }
 
     public void changeTerminal_status(String code) {
-        Terminal terminal = terminalRepository.getTerminal(code);
-        if (terminal == null) {
-            System.out.println("Bunday terminal mavjud emas");
-            return;
+        List<Terminal> terminal = terminalRepository.getTerminal(code);
+        String status = "";
+        int i = 0;
+        for (Terminal terminal1 : terminal) {
+            if (terminal1 == null) {
+                System.out.println("Bunday terminal mavjud emas");
+                return;
+            }
+            if (terminal1.getStatus().equals(GeneralStatus.BLOCK.toString())) {
+                status = GeneralStatus.ACTIVE.toString();
+                i = terminalRepository.changeTerminal_ACTIVE_status_fromDB(code, status);
+            }else if (terminal1.getStatus().equals(GeneralStatus.ACTIVE.toString())){
+                status = GeneralStatus.BLOCK.toString();
+                i = terminalRepository.changeTerminal_BLOCK_status_fromDB(code, status);
+            }
         }
-
-        String status = GeneralStatus.BLOCK.name();
-
-        if (terminal.getStatus().equals(GeneralStatus.BLOCK)) {
-            status = GeneralStatus.ACTIVE.name();
-
-        }
-
-        int i = terminalRepository.changeTerminal_status_fromDB(code, status);
-
         if (i == 0) {
             System.out.println("Failed");
         } else {

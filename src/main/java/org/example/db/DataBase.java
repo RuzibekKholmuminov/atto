@@ -13,6 +13,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class DataBase {
     public static Connection getConnection() {
@@ -271,11 +272,11 @@ public class DataBase {
 
     public static void addCompanyCard() {
 
-        Card card = new Card("999", null, 0L, GeneralStatus.ACTIVE, null, LocalDateTime.now());
+        Card card = new Card("999", null, 0L, GeneralStatus.ACTIVE.toString(), null, LocalDateTime.now());
         CardRepository cardRepository = new CardRepository();
-        Card card1 = cardRepository.searchCardByNumber(card.getNumber());
+        List<Card> card1 = cardRepository.searchCardByNumber(card.getNumber());
 
-        if (card1 != null) {
+        if (card1.get(0) == null) {
             return;
         }
         cardRepository.addCardToDb(card);

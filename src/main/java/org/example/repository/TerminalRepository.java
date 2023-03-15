@@ -1,8 +1,17 @@
 package org.example.repository;
 
 import org.example.db.DataBase;
+import org.example.dto.Card;
 import org.example.dto.Terminal;
 import org.example.util.TerminalUtil;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.boot.Metadata;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.query.Query;
 
 import java.sql.*;
 import java.util.LinkedList;
@@ -21,7 +30,7 @@ public class TerminalRepository {
             statement.setString(1, terminal.getCode());
             statement.setString(2, terminal.getAddress());
             statement.setTimestamp(3, Timestamp.valueOf(terminal.getCreated_date()));
-            statement.setString(4, terminal.getStatus().name());
+            statement.setString(4, terminal.getStatus());
 
             int resultSet = statement.executeUpdate();
             return resultSet;
@@ -47,70 +56,36 @@ public class TerminalRepository {
     }
 
 
-    public Terminal getTerminal(String code) {
-        Connection connection = DataBase.getConnection();
-        try {
-            PreparedStatement statement = connection.prepareStatement("select * from terminal where code=?");
-            statement.setString(1, code);
+    public List<Terminal> getTerminal(String code) {
+        StandardServiceRegistry ssr = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
+        Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
+        SessionFactory factory = meta.getSessionFactoryBuilder().build();
 
-            ResultSet resultSet = statement.executeQuery();
+        Session session = factory.openSession();
+        Transaction transaction = session.beginTransaction();
+        List<Terminal> terminals = session.createQuery("SELECT a from Terminal a where code = '" + code + "'", Terminal.class).getResultList();
 
-            while (resultSet.next()) {
+        transaction.commit();
 
-                return TerminalUtil.get_terminal(resultSet);
-            }
-
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            }
-        }
-
-        return null;
+        session.close();
+        factory.close();
+        return terminals;
     }
 
     public List<Terminal> get_terminal_list_fromDb() {
+        StandardServiceRegistry ssr = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
+        Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
+        SessionFactory factory = meta.getSessionFactoryBuilder().build();
 
-        Connection connection = DataBase.getConnection();
-        try {
-            PreparedStatement statement = connection.prepareStatement("select * from terminal ");
+        Session session = factory.openSession();
+        Transaction transaction = session.beginTransaction();
+        List<Terminal> terminals = session.createQuery("SELECT a from Terminal a ", Terminal.class).getResultList();
 
+        transaction.commit();
 
-            ResultSet resultSet = statement.executeQuery();
-
-            List<Terminal> terminals = new LinkedList<>();
-            while (resultSet.next()) {
-                terminals.add(TerminalUtil.get_terminal(resultSet));
-            }
-
-            return terminals;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            }
-        }
-
-        return null;
+        session.close();
+        factory.close();
+        return terminals;
     }
 
     public int updateTerminal_address_fromDB(String code, String address) {
@@ -182,32 +157,56 @@ public class TerminalRepository {
     }
 
     public int deleteTerminal_fromDb(String code) {
-        Connection connection = DataBase.getConnection();
-        try {
-            PreparedStatement statement = connection.prepareStatement("delete from terminal where code=? ;");
+        StandardServiceRegistry ssr = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
+        Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
+        SessionFactory factory = meta.getSessionFactoryBuilder().build();
 
-            statement.setString(1, code);
+        Session session = factory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.createQuery("DELETE from Terminal where code = '" + code + "'", Card.class).getResultList();
 
-            int resultSet = statement.executeUpdate();
+        transaction.commit();
 
-            return resultSet;
-
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            }
-        }
-
+        session.close();
+        factory.close();
         return 0;
+    }
+
+    public int changeTerminal_ACTIVE_status_fromDB(String code, String status) {
+        StandardServiceRegistry ssr = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
+        Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
+        SessionFactory factory = meta.getSessionFactoryBuilder().build();
+
+        Session session = factory.openSession();
+        session.beginTransaction();
+        Query query = session.createQuery("update Terminal set status = :status" +
+                " where code = :code");
+        query.setParameter("status", status);
+        query.setParameter("code", code);
+        int result = query.executeUpdate();
+        session.getTransaction().commit();
+
+        session.close();
+        factory.close();
+        return 1;
+    }
+
+    public int changeTerminal_BLOCK_status_fromDB(String code, String status) {
+        StandardServiceRegistry ssr = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
+        Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
+        SessionFactory factory = meta.getSessionFactoryBuilder().build();
+
+        Session session = factory.openSession();
+        session.beginTransaction();
+        Query query = session.createQuery("update Terminal set status = :status" +
+                " where code = :code");
+        query.setParameter("status", status);
+        query.setParameter("code", code);
+        int result = query.executeUpdate();
+        session.getTransaction().commit();
+
+        session.close();
+        factory.close();
+        return 1;
     }
 }

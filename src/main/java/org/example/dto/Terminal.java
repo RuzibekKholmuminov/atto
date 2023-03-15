@@ -16,21 +16,21 @@ public class Terminal {
     @Column(name = "address")
     private String address;
     @Column(name = "status")
-    private GeneralStatus status;
+    private String status;
     @Column(name = "created_date")
     private LocalDateTime created_date;
 
     public Terminal() {
     }
 
-    public Terminal(String code, String address, GeneralStatus status, LocalDateTime created_date) {
+    public Terminal(String code, String address, String status, LocalDateTime created_date) {
         this.code = code;
         this.address = address;
         this.status = status;
         this.created_date = created_date;
     }
 
-    public Terminal(Integer id, String code, String address, GeneralStatus status, LocalDateTime created_date) {
+    public Terminal(Integer id, String code, String address, String status, LocalDateTime created_date) {
         this.id = id;
         this.code = code;
         this.address = address;
@@ -62,11 +62,11 @@ public class Terminal {
         this.address = address;
     }
 
-    public GeneralStatus getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(GeneralStatus status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 

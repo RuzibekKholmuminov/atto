@@ -46,7 +46,7 @@ public class AdminCardController {
         Card card_from_scanner = CardUtil.getFromScanner();
 
 
-        Card card = new Card(card_from_scanner.getNumber(), card_from_scanner.getExp_date(), 0L, GeneralStatus.ACTIVE, null, LocalDateTime.now());
+        Card card = new Card(card_from_scanner.getNumber(), card_from_scanner.getExp_date(), 0L, GeneralStatus.ACTIVE.toString(), null, LocalDateTime.now());
 
         cardService.update(card);
 
@@ -88,7 +88,6 @@ public class AdminCardController {
     }
 
     private void get_card_list() {
-
         cardService.get_card_list();
 
     }
@@ -98,7 +97,7 @@ public class AdminCardController {
         Card card_from_scanner = CardUtil.getFromScanner();
 
 
-        Card card = new Card(card_from_scanner.getNumber(), card_from_scanner.getExp_date(), 0L, GeneralStatus.ACTIVE, null, LocalDateTime.now());
+        Card card = new Card(card_from_scanner.getNumber(), card_from_scanner.getExp_date(), 0L, GeneralStatus.ACTIVE.toString(), null, LocalDateTime.now());
 
         cardService.addCard_toDb(card);
 

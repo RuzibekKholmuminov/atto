@@ -1,349 +1,175 @@
 package org.example.repository;
 
-import org.example.db.DataBase;
 import org.example.dto.Card;
-import org.example.util.CardUtil;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.boot.Metadata;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.query.Query;
 
-import java.sql.*;
-import java.time.LocalDate;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 
 public class CardRepository {
 
     public int addCardToDb(Card card) {
+        StandardServiceRegistry ssr = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
+        Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
+        SessionFactory factory = meta.getSessionFactoryBuilder().build();
 
+        Session session = factory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.save(card);
+        transaction.commit();
 
-        Connection connection = DataBase.getConnection();
-        try {
-            PreparedStatement statement = connection.prepareStatement(
-                    "insert into card(number,exp_date,created_date,status,balance) " +
-                            "values (?,?,?,?,?)");
-            statement.setString(1, card.getNumber());
-            statement.setDate(2, Date.valueOf(LocalDate.now()));
-            statement.setTimestamp(3, Timestamp.valueOf(card.getCreated_date()));
-            statement.setString(4, card.getStatus().name());
-            statement.setLong(5, card.getBalance());
-
-            return statement.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            }
-        }
-
+        session.close();
+        factory.close();
         return 0;
     }
 
 
     public List<Card> get_card_list() {
+        StandardServiceRegistry ssr = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
+        Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
+        SessionFactory factory = meta.getSessionFactoryBuilder().build();
 
-        Connection connection = DataBase.getConnection();
-        try {
-            PreparedStatement statement = connection.prepareStatement("select * from card");
+        Session session = factory.openSession();
+        Transaction transaction = session.beginTransaction();
+        List<Card> cards = session.createQuery("SELECT a from Card a", Card.class).getResultList();
 
-            ResultSet resultSet = statement.executeQuery();
-            List<Card> cardList = new LinkedList<>();
-            while (resultSet.next()) {
+        transaction.commit();
 
-                cardList.add(CardUtil.get_card(resultSet));
-            }
-
-            return cardList;
-
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            }
-        }
-
-        return null;
+        session.close();
+        factory.close();
+        return cards;
 
     }
 
 
-    public Card searchCardByNumber(String number) {
-        Connection connection = DataBase.getConnection();
-        try {
-            PreparedStatement statement = connection.prepareStatement("select * from card where number=?");
-            statement.setString(1, number);
+    public List<Card> searchCardByNumber(String number) {
+        StandardServiceRegistry ssr = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
+        Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
+        SessionFactory factory = meta.getSessionFactoryBuilder().build();
 
-            ResultSet resultSet = statement.executeQuery();
+        Session session = factory.openSession();
+        Transaction transaction = session.beginTransaction();
+        List<Card> cards = session.createQuery("SELECT a from Card a where number = '" + number + "'", Card.class).getResultList();
 
-            while (resultSet.next()) {
+        transaction.commit();
 
-                return CardUtil.get_card(resultSet);
-
-            }
-
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            }
-        }
-
-        return null;
+        session.close();
+        factory.close();
+        return cards;
     }
 
     public int updateCardFromDb(Card card) {
-        Connection connection = DataBase.getConnection();
-        try {
-            PreparedStatement statement = connection.prepareStatement("update card set exp_date=? where number=? ;");
-            statement.setDate(1, Date.valueOf(card.getExp_date()));
-            statement.setString(2, card.getNumber());
 
-            return statement.executeUpdate();
-
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            }
-        }
 
         return 0;
 
     }
 
-    public int changeStatus(String number, String status) {
+    public int changeACTIVEStatus(String number, String status) {
+        StandardServiceRegistry ssr = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
+        Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
+        SessionFactory factory = meta.getSessionFactoryBuilder().build();
 
-        Connection connection = DataBase.getConnection();
-        try {
-            PreparedStatement statement = connection.prepareStatement("update card set status=? where number=? ;");
-            statement.setString(1, status);
-            statement.setString(2, number);
+        Session session = factory.openSession();
+        session.beginTransaction();
+        Query query = session.createQuery("update Card set status = :status" +
+                " where number = :number");
+        query.setParameter("status", status);
+        query.setParameter("number", number);
+        int result = query.executeUpdate();
+        session.getTransaction().commit();
 
+        session.close();
+        factory.close();
+        return 1;
+    }
 
-            return statement.executeUpdate();
+    public int changeBLOCKStatus(String number, String status) {
+        StandardServiceRegistry ssr = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
+        Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
+        SessionFactory factory = meta.getSessionFactoryBuilder().build();
 
+        Session session = factory.openSession();
+        session.beginTransaction();
+        Query query = session.createQuery("update Card set status = :status" +
+                " where number = :number");
+        query.setParameter("status", status);
+        query.setParameter("number", number);
+        int result = query.executeUpdate();
+        session.getTransaction().commit();
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            }
-        }
-
-        return 0;
+        session.close();
+        factory.close();
+        return 1;
     }
 
 
     public int deleteCardFromDb(String number) {
-        Connection connection = DataBase.getConnection();
-        try {
-            PreparedStatement statement = connection.prepareStatement("delete  from card  where number=? ;");
-            statement.setString(1, number);
+        StandardServiceRegistry ssr = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
+        Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
+        SessionFactory factory = meta.getSessionFactoryBuilder().build();
 
+        Session session = factory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.createQuery("DELETE from Card where number = '" + number + "'", Card.class).getResultList();
 
-            return statement.executeUpdate();
+        transaction.commit();
 
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            }
-        }
-
+        session.close();
+        factory.close();
         return 0;
     }
 
     public int addPhone_to_Card(String number, String phone) {
-        Connection connection = DataBase.getConnection();
-        try {
-            PreparedStatement statement = connection.prepareStatement("update card set phone=? where number=? ;");
-            statement.setString(1, phone);
-            statement.setString(2, number);
+        StandardServiceRegistry ssr = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
+        Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
+        SessionFactory factory = meta.getSessionFactoryBuilder().build();
 
-            return statement.executeUpdate();
+        Session session = factory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.createQuery("UPDATE Card set phone = " + phone + " where number = " + number + "", Card.class).getResultList();
 
+        transaction.commit();
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            }
-        }
-
-        return 0;
+        session.close();
+        factory.close();
+        return 1;
     }
 
     public List<Card> get_profile_card_list_fromDb(String phone) {
-
-        Connection connection = DataBase.getConnection();
-        try {
-            PreparedStatement statement = connection.prepareStatement("select * from card where phone=?");
-            statement.setString(1, phone);
-
-            ResultSet resultSet = statement.executeQuery();
-            List<Card> cardList = new LinkedList<>();
-            while (resultSet.next()) {
-
-                cardList.add(CardUtil.get_card(resultSet));
-            }
-
-            return cardList;
-
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            }
-        }
-
         return null;
     }
 
     public int change_profile_card_status_fromDB(String phone, String number, String status) {
-        Connection connection = DataBase.getConnection();
-        try {
-            PreparedStatement statement = connection.prepareStatement("update card set status=? where number=? and phone=? ;");
-            statement.setString(1, status);
-            statement.setString(2, number);
-            statement.setString(3, phone);
-
-            return statement.executeUpdate();
-
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            }
-        }
 
         return 0;
     }
 
     public int delete_phone_from_card(String number) {
-        Connection connection = DataBase.getConnection();
-        try {
-            PreparedStatement statement = connection.prepareStatement("update   card set phone=null  where number=? ;");
-            statement.setString(1, number);
-
-
-            return statement.executeUpdate();
-
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            }
-        }
 
         return 0;
 
     }
 
-    public void companyCard() {
-        try {
-            Connection con = DataBase.getConnection();
-            Statement statement = con.createStatement();
+    public List<Card> companyCard() {
+        StandardServiceRegistry ssr = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
+        Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
+        SessionFactory factory = meta.getSessionFactoryBuilder().build();
 
-            ResultSet resultSet = statement.executeQuery("Select * from card where number = '999'");
-            while (resultSet.next()) {
-                String number = resultSet.getString("number");
-                Integer balance = resultSet.getInt("balance");
-                String status = resultSet.getString("status");
-                Timestamp created_date = resultSet.getTimestamp("created_date");
+        Session session = factory.openSession();
+        Transaction transaction = session.beginTransaction();
+        List<Card> cards = session.createQuery("SELECT a from Card a where exp_date = " + null + "", Card.class).getResultList();
 
-                System.out.println("Number:" + number + " Balance =" + balance + " Status =" + status + " created_date:" + created_date);
-            }
-            con.close();
+        transaction.commit();
 
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
+        session.close();
+        factory.close();
+        return cards;
     }
 }

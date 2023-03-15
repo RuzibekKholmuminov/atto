@@ -3,6 +3,7 @@ package org.example.util;
 import org.example.dto.Card;
 import org.example.enums.GeneralStatus;
 
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -17,13 +18,13 @@ public class CardUtil {
         System.out.print("Enter number: ");
         String number = scanner.next();
 
-        LocalDate localDate;
+        Date date;
 
         while (true) {
             try {
                 System.out.print("Enter exp_date (yyyy-MM-dd) : ");
                 String exp_date = scanner.next();
-                localDate = LocalDate.parse(exp_date);
+                date = Date.valueOf(exp_date);
                 break;
             } catch (RuntimeException e) {
                 System.out.println("Mazgi exp_date ni togri kirit");
@@ -32,7 +33,7 @@ public class CardUtil {
 
         Card card = new Card();
         card.setNumber(number);
-        card.setExp_date(localDate);
+        card.setExp_date(date);
 
         return card;
     }
@@ -44,17 +45,16 @@ public class CardUtil {
             Integer id = resultSet.getInt("id");
 
             String number = resultSet.getString("number");
-            java.sql.Date sqlDate = resultSet.getDate("exp_date");
+            Date date = resultSet.getDate("exp_date");
             Long balance = resultSet.getLong("balance");
             String status = resultSet.getString("status");
             String phone = resultSet.getString("phone");
             Timestamp c_d = resultSet.getTimestamp("created_date");
 
-            LocalDate localDate = sqlDate.toLocalDate();
-
-            return new Card(id, number, localDate, balance, GeneralStatus.valueOf(status), phone, c_d.toLocalDateTime());
+            return new Card(id, number, date, balance, GeneralStatus.ACTIVE.toString(), phone, c_d.toLocalDateTime());
 
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
 
         }
