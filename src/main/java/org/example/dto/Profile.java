@@ -9,17 +9,22 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "Profile")
 public class Profile {
-//    name,surname,phone unique,pswd,created_date,status,role
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column("name")
+    @Column(name = "name")
     private String name;
+    @Column(name = "surname")
     private String surname;
+    @Column(name = "phone")
     private String phone;
+    @Column(name = "password")
     private String password;
+    @Column(name = "created_date")
     private LocalDateTime created_date;
+    @Column(name = "status")
     private GeneralStatus status;
+    @Column(name = "role")
     private ProfileRole role;
 
     public Profile(String sanjar, String aliyev, String s, String md5) {
@@ -48,6 +53,10 @@ public class Profile {
         this.created_date = created_date;
         this.status = status;
         this.role = role;
+    }
+
+    public Profile() {
+
     }
 
     public String getName() {

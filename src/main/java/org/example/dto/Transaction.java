@@ -3,15 +3,24 @@ package org.example.dto;
 import org.example.enums.TransactionType;
 import org.example.enums.TransactionType;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "Transaction")
 public class Transaction {
-    //    card_number,amount,terminal_code,type,created_date
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
+    @Column(name = "card_number")
     private String card_number;
+    @Column(name = "amount")
     private Long amount;
+    @Column(name = "terminal_code")
     private String terminal_code;
+    @Column(name = "transactionType")
     private TransactionType transactionType;
+    @Column(name = "created_date")
     private LocalDateTime created_date;
 
     public Transaction() {

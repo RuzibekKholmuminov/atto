@@ -2,14 +2,22 @@ package org.example.dto;
 
 import org.example.enums.GeneralStatus;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "Terminal")
 public class Terminal {
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @Column(name = "code")
     private String code;
+    @Column(name = "address")
     private String address;
+    @Column(name = "status")
     private GeneralStatus status;
+    @Column(name = "created_date")
     private LocalDateTime created_date;
 
     public Terminal() {

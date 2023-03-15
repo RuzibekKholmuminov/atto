@@ -1,11 +1,19 @@
 package org.example.dto;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "Profile_Card")
 public class Profile_Card {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @Column(name = "profile_phone")
     private String profile_phone;
+    @Column(name = "card_number")
     private String card_number;
+    @Column(name = "added_date")
     private LocalDateTime added_date;
 
     public Profile_Card() {
