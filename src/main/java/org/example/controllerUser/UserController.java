@@ -43,7 +43,7 @@ public class UserController {
         System.out.print("Enter terminal code: ");
         String terminal_c = scanner.next();
 
-        Transaction transaction = new Transaction(number, 1400L, terminal_c, TransactionType.Payment, LocalDateTime.now());
+        Transaction transaction = new Transaction(number, 1400, terminal_c, TransactionType.Payment, LocalDateTime.now());
 
         transactionService.make_payment(transaction,profile.getPhone());
 
@@ -60,7 +60,7 @@ public class UserController {
         String number = scanner.next();
 
         System.out.println("Enter amount: ");
-        Long amount = scanner.nextLong();
+        Integer amount = scanner.nextInt();
 
         transactionService.profile_reFill(profile.getPhone(), number, amount);
 

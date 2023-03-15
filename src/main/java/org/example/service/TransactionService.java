@@ -1,6 +1,5 @@
 package org.example.service;
 
-import org.example.controller.AuthController;
 import org.example.dto.Card;
 import org.example.dto.Transaction;
 import org.example.enums.TransactionType;
@@ -28,7 +27,7 @@ public class TransactionService {
 
     }
 
-    public void profile_reFill(String phone, String number, Long amount) {
+    public void profile_reFill(String phone, String number, Integer amount) {
 
         CardRepository cardRepository = new CardRepository();
         List<Card> card = cardRepository.searchCardByNumber(number);

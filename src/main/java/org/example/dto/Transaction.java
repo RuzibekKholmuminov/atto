@@ -1,7 +1,6 @@
 package org.example.dto;
 
 import org.example.enums.TransactionType;
-import org.example.enums.TransactionType;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -15,7 +14,7 @@ public class Transaction {
     @Column(name = "card_number")
     private String card_number;
     @Column(name = "amount")
-    private Long amount;
+    private Integer amount;
     @Column(name = "terminal_code")
     private String terminal_code;
     @Column(name = "transactionType")
@@ -26,7 +25,7 @@ public class Transaction {
     public Transaction() {
     }
 
-    public Transaction(String card_number, Long amount, String terminal_code, TransactionType transactionType, LocalDateTime created_date) {
+    public Transaction(String card_number, Integer amount, String terminal_code, TransactionType transactionType, LocalDateTime created_date) {
         this.card_number = card_number;
         this.amount = amount;
         this.terminal_code = terminal_code;
@@ -34,7 +33,7 @@ public class Transaction {
         this.created_date = created_date;
     }
 
-    public Transaction(Integer id, String card_number, Long amount, String terminal_code, TransactionType transactionType, LocalDateTime created_date) {
+    public Transaction(Integer id, String card_number, Integer amount, String terminal_code, TransactionType transactionType, LocalDateTime created_date) {
         this.id = id;
         this.card_number = card_number;
         this.amount = amount;
@@ -59,11 +58,11 @@ public class Transaction {
         this.card_number = card_number;
     }
 
-    public Long getAmount() {
+    public Integer getAmount() {
         return amount;
     }
 
-    public void setAmount(Long amount) {
+    public void setAmount(Integer amount) {
         this.amount = amount;
     }
 

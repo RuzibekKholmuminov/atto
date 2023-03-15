@@ -143,7 +143,17 @@ public class CardRepository {
     }
 
     public List<Card> get_profile_card_list_fromDb(String phone) {
-        return null;
+        StandardServiceRegistry ssr = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
+        Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
+        SessionFactory factory = meta.getSessionFactoryBuilder().build();
+
+        Session session = factory.openSession();
+        Transaction transaction = session.beginTransaction();
+        List<Card> cards = session.createQuery("SELECT a from Card a where phone = '" + phone + "'", Card.class).getResultList();
+        transaction.commit();
+        session.close();
+        factory.close();
+        return cards;
     }
 
     public int change_profile_card_status_fromDB(String phone, String number, String status) {

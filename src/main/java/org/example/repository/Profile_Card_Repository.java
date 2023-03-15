@@ -1,6 +1,7 @@
 package org.example.repository;
 
 import org.example.db.DataBase;
+import org.example.dto.Card;
 import org.example.dto.Profile_Card;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -33,32 +34,18 @@ public class Profile_Card_Repository {
 
 
     public int delete_profile_card(String phone, String number) {
+        StandardServiceRegistry ssr = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
+        Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
+        SessionFactory factory = meta.getSessionFactoryBuilder().build();
 
-        Connection connection = DataBase.getConnection();
-        try {
-            PreparedStatement statement = connection.prepareStatement("delete from profile_card where profile_phone=? and card_number=?;");
-            statement.setString(1, phone);
-            statement.setString(2, number);
+        Session session = factory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.createQuery("DELETE from Profile_Card where card_number = '" + number + "' and profile_phone = '" + phone + "'", Profile_Card.class).getResultList();
 
-            return statement.executeUpdate();
+        transaction.commit();
 
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            }
-        }
-
+        session.close();
+        factory.close();
         return 0;
-
     }
 }

@@ -53,11 +53,17 @@ public class Profile_Card_Service {
     }
 
     public void change_profile_card_status(String phone, String number) {
-        Card card = (Card) cardRepository.searchCardByNumber(number);
-
+        List<Card> card =  cardRepository.searchCardByNumber(number);
         String status = GeneralStatus.BLOCK.name();
-        if (card.getStatus().equals(GeneralStatus.BLOCK.toString())) {
-            status = GeneralStatus.ACTIVE.name();
+
+        for (Card card1 : card) {
+            if (card1.getStatus().equals(GeneralStatus.ACTIVE.toString())) {
+                status = GeneralStatus.BLOCK.toString();
+                cardRepository.changeACTIVEStatus(phone, status);
+            }else if (card1.getStatus().equals(GeneralStatus.BLOCK.toString())){
+                status = GeneralStatus.ACTIVE.toString();
+                cardRepository.changeBLOCKStatus(number,status);
+            }
         }
 
         int i = cardRepository.change_profile_card_status_fromDB(phone, number, status);

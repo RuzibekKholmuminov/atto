@@ -1,6 +1,7 @@
 package org.example.repository;
 
 import org.example.db.DataBase;
+import org.example.dto.Card;
 import org.example.dto.Transaction;
 import org.example.util.TransactionUtil;
 import org.hibernate.Session;
@@ -51,62 +52,34 @@ public class TransactionRepository {
         return transactionList;
     }
 
-    public int profile_refill(String number, Long amount) {
-        Connection connection = DataBase.getConnection();
-        try {
-            PreparedStatement statement = connection.prepareStatement("update card set balance=balance+? where number=? ;");
-            statement.setLong(1, amount);
-            statement.setString(2, number);
+    public int profile_refill(String number, Integer amount) {
+        StandardServiceRegistry ssr = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
+        Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
+        SessionFactory factory = meta.getSessionFactoryBuilder().build();
 
-            return statement.executeUpdate();
+        Session session = factory.openSession();
+        org.hibernate.Transaction transaction = session.beginTransaction();
+        session.createQuery("UPDATE Card set balance = balance + " + amount + " where number = " + number + "", Card.class).getResultList();
 
+        transaction.commit();
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            }
-        }
-
+        session.close();
+        factory.close();
         return 0;
     }
 
     public int addTransaction(Transaction transaction) {
+        StandardServiceRegistry ssr = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
+        Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
+        SessionFactory factory = meta.getSessionFactoryBuilder().build();
 
-        Connection connection = DataBase.getConnection();
-        try {
-            PreparedStatement statement = connection.prepareStatement("insert into transaction(card_number,amount,type,created_date,terminal_code) values (?,?,?,?,?);");
-            statement.setString(1, transaction.getCard_number());
-            statement.setLong(2, transaction.getAmount());
-            statement.setString(3, transaction.getTransactionType().name());
-            statement.setTimestamp(4, Timestamp.valueOf(transaction.getCreated_date()));
-            statement.setString(5, transaction.getTerminal_code());
-            return statement.executeUpdate();
+        Session session = factory.openSession();
+        org.hibernate.Transaction transaction1 = session.beginTransaction();
+        session.save(transaction);
+        transaction1.commit();
 
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            }
-        }
-
+        session.close();
+        factory.close();
         return 0;
     }
 
